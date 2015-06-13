@@ -1,0 +1,502 @@
+#include "main.h"
+
+int plateauMorpion[NB_LIGNE][NB_COLONNE];
+int borneAlpha, borneBeta;
+
+int Max(const int a, const int b)
+{
+	if(a > b)
+		return a;
+	else
+		return b;
+}
+
+int Min(const int a, const int b)
+{
+	if(a < b)
+		return a;
+	else
+		return b;
+}
+
+void initialiserMorpion(void)
+{
+	int indexLig, indexCol;
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+			plateauMorpion[indexLig][indexCol] = VIDE;
+}
+
+
+
+int compterNbSerieMorpion(const int typeJoueur, const int longueurSerie)
+{
+	int indexLig, indexCol;
+	int compteur;
+	int nbSerie;
+
+	nbSerie = 0;
+	
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{	
+		compteur = 0;
+				
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+				++compteur;
+			else
+				compteur = 0;
+
+			if(compteur == longueurSerie)
+			{
+				++nbSerie;
+				compteur = 0;
+			}
+		}
+	}
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{	
+		compteur = 0;
+				
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexCol][indexLig] == typeJoueur)
+				++compteur;
+			else
+				compteur = 0;
+
+			if(compteur == longueurSerie)
+			{
+				++nbSerie;
+				compteur = 0;
+			}
+		}
+	}
+
+	for(indexLig = 0, indexCol = 0; indexLig < NB_LIGNE; ++indexLig, ++indexCol)
+	{		
+		if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+			++compteur;
+		else
+			compteur = 0;
+	}	
+
+	if(compteur == longueurSerie)
+		++nbSerie;
+
+	compteur = 0;
+
+	for(indexLig = 0, indexCol = NB_COLONNE - 1; indexLig < NB_LIGNE; ++indexLig, --indexCol)
+	{		
+		if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+			++compteur;
+		else
+			compteur = 0;
+	}
+
+	if(compteur == longueurSerie)
+		++nbSerie;
+
+	return nbSerie;
+}
+
+int evaluationIA(void)
+{
+	int gagnant;
+
+	gagnant = gagnerMorpion();
+
+	if(gagnant == IA)
+		return SCORE_MAX;
+	else if(gagnant == JOUEUR)
+		return SCORE_MIN;
+	else
+	{
+		if(!plateauRempli())
+		{
+			int nbSerieJoueur, nbSerieIA;
+
+			nbSerieJoueur = compterNbSerieMorpion(JOUEUR, NB_LIGNE - 1);
+			nbSerieIA = compterNbSerieMorpion(IA, NB_LIGNE - 1);
+
+			return nbSerieIA - nbSerieJoueur;
+		}
+		else
+			return SCORE_NUL;
+	}
+}
+
+int valeurMaxMinMax(const int typeJoueur, const int profondeur)
+{
+	int indexLig, indexCol;
+	int maxIA, valeurNoeud;
+	int adversaire;
+
+	if(typeJoueur == IA)
+		adversaire = JOUEUR;
+	else if(typeJoueur == JOUEUR)
+		adversaire = IA;
+
+	maxIA = SCORE_MIN;
+
+	if(gagnerMorpion() != 0 || profondeur == 0)
+		return evaluationIA();
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = adversaire;
+		
+				valeurNoeud = valeurMinMinMax(typeJoueur, profondeur - 1);
+
+				if(valeurNoeud > maxIA)
+					maxIA = valeurNoeud;
+
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	return maxIA;
+}
+
+int valeurMinMinMax(const int typeJoueur, const int profondeur)
+{
+	int indexLig, indexCol;
+	int minIA, valeurNoeud;
+
+	minIA = SCORE_MAX;
+
+	if(gagnerMorpion() != 0 || profondeur == 0)
+		return evaluationIA();
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = typeJoueur;
+		
+				valeurNoeud = valeurMaxMinMax(typeJoueur, profondeur - 1);
+
+				if(valeurNoeud < minIA)
+					minIA = valeurNoeud;
+
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	return minIA;
+}
+
+void IAMorpionMinMax(const int typeJoueur, const int profondeur)
+{
+	int indexLig, indexCol;
+	int coupLig, coupCol;
+	int maxIA, valeurNoeud;
+
+	maxIA = SCORE_MIN;
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = typeJoueur;
+		
+				valeurNoeud = valeurMaxMinMax(typeJoueur, profondeur - 1);
+
+				if(valeurNoeud > maxIA)
+				{
+					maxIA = valeurNoeud;
+					coupLig = indexLig;
+					coupCol = indexCol;
+				}
+
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	plateauMorpion[coupLig][coupCol] = typeJoueur;
+}
+
+int valeurMax(const int profondeur)
+{
+	int indexLig, indexCol;
+	int maxIA, valeurNoeud;
+
+	maxIA = SCORE_MIN;
+
+	if(gagnerMorpion() != 0 || profondeur == 0)
+		return evaluationIA();
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = JOUEUR;
+		
+				valeurNoeud = valeurMin(profondeur - 1);
+
+				if(valeurNoeud > maxIA)
+					maxIA = valeurNoeud;
+
+				if(valeurNoeud >= borneBeta)
+				{
+					plateauMorpion[indexLig][indexCol] = VIDE;
+					return valeurNoeud;
+				}
+
+				borneAlpha = Max(borneAlpha, valeurNoeud);
+
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	return maxIA;
+}
+
+int valeurMin(const int profondeur)
+{
+	int indexLig, indexCol;
+	int minIA, valeurNoeud;
+
+	minIA = SCORE_MAX;
+
+	if(gagnerMorpion() != 0 || profondeur == 0)
+		return evaluationIA();
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = IA;
+		
+				valeurNoeud = valeurMax(profondeur - 1);
+
+				if(valeurNoeud < minIA)
+					minIA = valeurNoeud;
+
+				if(valeurNoeud <= borneAlpha)
+				{
+					plateauMorpion[indexLig][indexCol] = VIDE;
+					return valeurNoeud;
+				}
+				
+				borneBeta = Min(borneBeta, valeurNoeud);
+				
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	return minIA;
+}
+
+void IAMorpion(const int profondeur)
+{
+	int indexLig, indexCol;
+	int coupLig, coupCol;
+	int maxIA, valeurNoeud;
+
+	maxIA = SCORE_MIN;
+
+	borneAlpha = SCORE_MIN;
+	borneBeta = SCORE_MAX;
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+			{
+				plateauMorpion[indexLig][indexCol] = IA;
+		
+				valeurNoeud = valeurMax(profondeur - 1);
+
+				if(valeurNoeud > maxIA)
+				{
+					maxIA = valeurNoeud;
+					coupLig = indexLig;
+					coupCol = indexCol;
+				}
+
+				plateauMorpion[indexLig][indexCol] = VIDE;
+			}
+		}
+	}
+
+	plateauMorpion[coupLig][coupCol] = IA;
+}
+
+int plateauRempli(void)
+{
+	int indexLig, indexCol;
+
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+			if(plateauMorpion[indexLig][indexCol] == VIDE)
+				return 0;
+
+	return 1;
+}
+
+int verifierLigneGagnerMorpion(const int typeJoueur)
+{
+	int indexLig, indexCol;
+	int compteur;
+	
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{	
+		compteur = 0;
+				
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+				++compteur;
+
+			if(compteur == NB_LIGNE)
+				return 1;
+		}
+	}	
+		
+	return 0;
+}
+
+int verifierColonneGagnerMorpion(const int typeJoueur)
+{
+	int indexLig, indexCol;
+	int compteur;
+	
+	for(indexLig = 0; indexLig < NB_LIGNE; ++indexLig)
+	{	
+		compteur = 0;
+				
+		for(indexCol = 0; indexCol < NB_COLONNE; ++indexCol)
+		{
+			if(plateauMorpion[indexCol][indexLig] == typeJoueur)
+				++compteur;
+
+			if(compteur == NB_COLONNE)
+				return 1;
+		}
+	}	
+		
+	return 0;
+}
+
+int verifierDiagonaleGagnerMorpion(const int typeJoueur)
+{
+	int indexLig, indexCol;
+	int compteur;
+	
+	compteur = 0;
+
+	for(indexLig = 0, indexCol = 0; indexLig < NB_LIGNE; ++indexLig, ++indexCol)
+	{	
+			
+		if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+			++compteur;
+	}	
+
+	if(compteur == NB_LIGNE)
+		return 1;
+
+	compteur = 0;
+
+	for(indexLig = 0, indexCol = NB_COLONNE - 1; indexLig < NB_LIGNE; ++indexLig, --indexCol)
+	{	
+			
+		if(plateauMorpion[indexLig][indexCol] == typeJoueur)
+			++compteur;
+	}
+
+	if(compteur == NB_LIGNE)
+		return 1;
+		
+	return 0;
+}
+
+int gagnerMorpion(void)
+{
+	if(verifierLigneGagnerMorpion(JOUEUR))
+		return JOUEUR;
+	else if(verifierColonneGagnerMorpion(JOUEUR))
+		return JOUEUR;
+	else if(verifierDiagonaleGagnerMorpion(JOUEUR))
+		return JOUEUR;
+
+	if(verifierLigneGagnerMorpion(IA))
+		return IA;
+	else if(verifierColonneGagnerMorpion(IA))
+		return IA;
+	else if(verifierDiagonaleGagnerMorpion(IA))
+		return IA;
+
+	return VIDE;
+}
+
+void jeuMorpion(void)
+{
+	int indexPartie;
+	int nbGagne, nbPerdu, nbNul;
+
+	 nbGagne = nbPerdu = nbNul = 0;
+
+	for(indexPartie = 0; indexPartie < 100; ++indexPartie)
+	{
+		int gagnantMorpion;
+
+		gagnantMorpion = VIDE;
+		initialiserMorpion();
+
+		do
+		{
+			if(!plateauRempli() && !gagnantMorpion)
+				IAMorpionMinMax(JOUEUR, PROFONDEUR_IA);
+
+			gagnantMorpion = gagnerMorpion();
+
+			if(!plateauRempli() && !gagnantMorpion)
+				IAMorpion(PROFONDEUR_IA);
+
+			gagnantMorpion = gagnerMorpion();
+
+		} while(!plateauRempli() && !gagnantMorpion);
+
+		if(gagnantMorpion == IA)
+			++nbGagne;
+		else if(gagnantMorpion == JOUEUR)
+			++nbPerdu;
+		else
+			++nbNul;
+	}
+
+	printf("Gagne : %d\n", nbGagne);
+	printf("Perdu : %d\n", nbPerdu);
+	printf("Nul : %d\n", nbNul);
+}
+
+int main(void)
+{
+	srand(time(NULL));
+
+	jeuMorpion();
+
+	return 0;
+}
