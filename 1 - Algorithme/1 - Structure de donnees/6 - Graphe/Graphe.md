@@ -27,6 +27,8 @@ En revanche on dit d'un graphe qu'il est *non orienté* si aucun sens n'est attr
 
 ![Graphe non orienté](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/Image/graphe_non_oriente.png)
 
+Dans ce cas précis, on peut donc parcourir les arcs dans les deux sens.
+
 ### Pondéré/non pondéré
 
 Un graphe est *pondéré* si ses arcs ont un *poids* :
@@ -57,13 +59,69 @@ Lorsque le nombre d'arcs est faible, on parle d'un graphe *creux* :
 
 ## Implémentation
 
-// TODO : représentation + code + explication
+On peut implémenter un graphe de différentes façons.
 
-On peut implémenter un graphe de différentes façons :
+### Matrice d'adjacence
 
-   - **Matrice d'adjacence** : tableau 2D stockant pour chaque nœud les nœuds auquel il est relié (le tableau peut être un tableau de booléen, ou bien un tableau d'entier pouvant alors stocker le poids des arcs reliant les deux nœuds). Cette représentation a donc une complexité en mémoire de *O(N²)* mais permet de vérifier si deux nœuds sont voisins en *O(1*).
-   - **Liste d'adjacence** : complexité en mémoire de O(N + M) -> vector \<Noeud\>
-   - **Liste d'arcs** : complexité en mémoire (OM) -> vector \<Arc\>
+Une matrice d'adjacence est comme son nom l'indique un tableau 2D qui permet de représenter des arcs entre deux nœuds. On peut utiliser un tableau 2D de booléen (`true` = arc, `false` = pas d'arc), ou bien un tableau 2D d'entier (ou de flottant) qui permet alors de stocker les pondérations des arcs (*X* = pondération de l'arc, 0 = par d'arc).
+
+Voici un exemple de matrice d'adjacence (j'ai utilisé le tout premier graphe de l'article pour construire la matrice) :
+
+![Exemple de matrice d'adjacence](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/Image/exemple_matrice_adjacence.png)
+
+Rien de bien compliqué pour l'implémenter :
+
+```c
+int graphe[NB_NOEUD_MAX][NB_NOEUD_MAX];
+```
+
+Encore une fois, on peut changer le type de la matrice en fonction de nos besoins (`bool`, `float`, `double`...).
+
+On utilise ce type de représentation lorsqu'on a tout d'abord assez de mémoire, puis lorsqu'on a besoin d'accéder souvent et rapidement à des informations du type :
+
+   - Est-ce que le nœud *A* et le nœud *B* sont voisins ?
+   - Quel est le poids de l'arc entre le nœud *C* et *D* ?
+
+La complexité en mémoire est en *O(N²)* (avec *N* le nombre de nœuds du graphe) et la complexité pour accéder aux deux informations citées au dessus est en *O(1)* (puisqu'il s'agit d'un tableau).
+
+### Liste d'adjacence
+
+On peut utiliser une variante de la matrice d'adjacence afin d'économiser de la mémoire (mais cette représentation requiert un temps en *O(N)* pour savoir si deux nœuds sont voisins ou pour connaître la pondération de tel arc). Cette solution consiste à utiliser un tableau de [listes chaînées](https://itechome.wordpress.com/algorithme/structure-de-donnees/liste-chainee/), chaque nœud du graphe a sa propre liste chaînée contenant tous ses voisins (et éventuellement toutes les pondérations).
+
+Voici par exemple la liste d'adjacence qui représente le premier graphe de l'article :
+
+![Exemple de liste d'adjacence](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/Image/exemple_liste_adjacence.png)
+
+Pour l'implémentation, j'utilise les `vector` du C++ au lieu de recoder à la main la liste chaînée en C (même si on peut tout à fait le faire, recoder des structures de données basiques en concours notamment est tout simplement une perte de temps) :
+
+```c++
+vector <Voisin> graphe[NB_NOEUD_MAX];
+```
+
+La structure `Voisin` contient l'index du voisin, mais elle peut aussi contenir la pondération de l'arc liant les deux nœuds et d'autres informations spécifiques au graphe.
+
+La liste d'adjacence est le plus souvent utilisée lorsque :
+
+   - On a pas assez de mémoire pour stocker une matrice d'adjacence : la complexité en mémoire d'une liste d'adjacence est de  *O(N + M)* (avec *M* le nombre d'arcs du graphe)
+   - On ne cherche pas à répondre aux questions du types tel nœud est-il voisin à tel autre nœud ? Ou encore quel est le poids de tel arc entre ces deux nœuds ? Mais plutôt lorsqu'on cherche à parcourir le graphe plus rapidement qu'en utilisant une matrice d'adjacence. En effet, dans une liste d'adjacence il n'y a que les voisins du nœud en question, alors que dans la matrice tous les nœuds sont représentés.
+
+### Liste d'arcs
+
+Enfin on peut utiliser une dernière solution, en représentant tous les arcs du graphe dans une liste chaînée.
+
+Voici l'exemple d'une liste d'arcs (toujours sur le même graphe) :
+
+![Exemple de liste d'arcs](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/Image/exemple_liste_arcs.png)
+
+Pareil que pour la liste d'adjacence, j'utilise les `vector` :
+
+```c++
+vector <Arc> graphe;
+```
+
+La structure `Arc` contient l'index des deux nœuds ainsi que la pondération de l'arc (si c'est un graphe pondéré).
+
+Une liste d'arcs est plus rarement utilisée pour représenter un graphe, mais peut s'avérer très utile lorsqu'on a pas assez de mémoire (à cause du nombre trop élevé de nœuds) pour représenter le graphe avec une matrice d'adjacence ou même une liste d'adjacence. On utilise donc une liste d'arcs avec une complexité en mémoire de *O(M)*.
 
 ## Parcourir un graphe
 
@@ -84,10 +142,17 @@ Voici une liste non exhaustive d'opérations utiles lorsqu'on manipule un graphe
 - Arbre couvrant minimal
 - Composante fortement connexe
 
-*Plusieurs articles sur chacunes des opérations sont prévus*
+*Plusieurs articles sur chacunes des opérations sont prévus.*
 
 ## Conclusion
 
-Un graphe est une structure de données incontournable, cette structure est utilisée dans de très nombreux problèmes (plus ou moins complexes).
+Un graphe est une structure de données incontournable, utilisée dans de très nombreux problèmes (plus ou moins complexes) dans la vie de tous les jours dans beaucoup de domaines différents comme :
 
-// TODO : meilleure conclusion
+   - La planification de tâches
+   - L'utilisation d'internet
+   - Les cartes routières
+   - La création d'itinéraire
+   - Les composants d'un circuit électronique
+   - La représentation de molécule chimique
+   - ...
+
