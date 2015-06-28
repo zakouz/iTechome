@@ -6,13 +6,13 @@ Le parcours en profondeur (ou  plus communément *DFS* pour *Depth First Search*
 
 Un parcours en profondeur a la particularité de parcourir les nœuds du graphe les plus "profonds" en premier (c'est-à-dire les plus éloignés du nœud d'où commence le parcours) avant de "remonter" progressivement dans le graphe.
 
-On va donc chercher dans le graphe a aller le plus loin possible, puis une fois qu'on a atteint le bout, on remonte pour faire de même sur d'autre partie du graphe non explorée.
-
-// TODO : explication à améliorer
+On va donc chercher dans le graphe a aller le plus loin possible, puis une fois qu'on a atteint le bout, on remonte pour repartir de nouveau le plus loin possible dans une autre partie du graphe que l'on a pas encore explorée, et ainsi de suite jusqu'à la fin du parcours.
 
 ## Exemple
 
-Pour bien comprendre un DFS je pense qu'il est nécessaire de commencer par le visualiser sur un [arbre](https://itechome.wordpress.com/algorithme/structure-de-donnees/arbre/) (je rappelle au passage qu'un arbre n'est qu'un graphe particulier).
+Avant de prendre des exemples en utilisant des graphes, on peut citer un exemple d'utilisation de parcours en profondeur dans un graphe dit *implicite* : le labyrinthe. Imaginons que vous êtes dans un labyrinthe et que vous voulez trouver la sortie. Vous décidez alors qu'à chaque croisement vous prenez à gauche, une fois que vous avez visité entièrement un chemin et qu'il ne mène à rien, vous revenez naturellement sur vos pas jusqu'au dernier croisement que vous avez rencontré et cette fois ci vous allez à droite, vous continuez ainsi jusqu'à avoir trouvé la sortie. Et bien cet manière de réfléchir et d'agir pour trouver la sortie d'un labyrinthe utilise un parcours en profondeur. En effet vous parcourez un chemin en entier avant de revenir sur vos pas pour parcourir un autre chemin en entier et ainsi de suite. Maintenant que vous avez cette idée en tête on peut appliquer l'algorithme sur des graphes dit *explicites*.
+
+Pour bien comprendre un DFS je pense qu'il est nécessaire de commencer par visualiser son fonctionnement sur un [arbre](https://itechome.wordpress.com/algorithme/structure-de-donnees/arbre/) (je rappelle au passage qu'un arbre n'est qu'un graphe particulier).
 
 Voici donc un arbre, et on peut apercevoir l'effet d'un parcours en profondeur dessus :
 
@@ -30,7 +30,7 @@ Maintenant qu'on a vu l'exemple sur un arbre, on peut l'appliquer sur un graphe 
 
 Pour déterminer l'ordre de parcours, il va falloir choisir un nœud de départ (sur un arbre le nœud de départ est très souvent la racine). Une fois ce nœud choisi, on applique le principe du parcours en profondeur comme pour l'exemple avec l'arbre.
 
-// TODO : finir les exemples
+// TODO : finir exemple graphe quelconque
 
 ## Pseudo-code
 
@@ -54,7 +54,9 @@ DFS(Nœud) :
 
 On fait en sorte de vérifier qu'on n'a pas déjà visité le nœud pour ne pas tomber dans une récursion infinie en utilisant tout simplement un tableau de booléen. Ensuite pour chacun des voisins du nœud, on va faire un appel récursif pour créer cette idée de parcours en profondeur. Par exemple si l'on reprend le parcours en profondeur effectué sur l'arbre dans la dernière partie, on commence à la racine (le nœud 1), on entre dans la boucle, on effectue l'appel récursif en donnant comme argument le nœud 2, on rentre dans la boucle, on effectue l'appel récursif en donnant comme argument le nœud 3, on rentre dans la boucle, aucun voisin donc l'appel se termine, on revient là où on s'était arrêté pour le nœud 2, on effectue donc l'appel récursif sur son prochain voisin (le nœud 4) etc.
 
-// TODO : difficile de comprendre si on ne connait pas la récursivité
+Cette notion d'appels récursifs imbriqués peut être difficile à comprendre si l'on est pas familier avec la récursivité.
+
+// TODO : détailler dernière phrase
 
 ### Version itérative
 
@@ -91,10 +93,16 @@ Pour l'implémentation, j'utilise une liste d'adjacence afin de stocker les vois
 
 recursif.c : 
 
+Comme précisé dans le code j'ai utilisé le même arbre que vu dans les exemples pour la démonstration. Quand on lance le programme on remarque qu'il affiche bien : `1 2 3 4 5 6 7 8 9 10` comme prévu. Le code est simple à comprendre et ne change en rien du pseudo-code.
+
 ### Version itérative
 
 iteratif.c :
 
+De même que pour la version récursive, le code ne change pas beaucoup du pseudo-code. Il faut noter que lorsqu'on exécute le code on obtient : `1 7 8 10 9 2 4 6 5 3`, non le résultat n'est pas faux, non le code n'est pas faux, c'est uniquement du au fait que lorsqu'on empile par exemple deux nœuds voisins, le deuxième va forcément finir au dessus du premier, alors que si on avait fait un appel récursif sur les nœuds voisins, le premier serait passé avant le deuxième. Ici notre parcours est bien un parcours en profondeur, mais dans "l'autre sens", vous pouvez vérifier, l'algorithme va juste à droite au lieu d'aller à gauche en premier, mais l'idée du parcours est la même (on peut reprendre le schéma illustrant le parcours en profondeur sur un arbre, et dessiner la flèche dans l'autre sens, c'est ce que fait la version itérative ici).
+
 ## Conclusion
 
 Le parcours en profondeur n'est pas forcément le parcours le plus simple à comprendre, mais une fois compris il peut s'avérer très utile et reste simple à coder.
+
+// TODO : meilleure conclusion 
