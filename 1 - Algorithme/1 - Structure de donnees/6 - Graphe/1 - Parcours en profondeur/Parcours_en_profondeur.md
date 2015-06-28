@@ -16,13 +16,13 @@ Pour bien comprendre un DFS je pense qu'il est nécessaire de commencer par le v
 
 Voici donc un arbre, et on peut apercevoir l'effet d'un parcours en profondeur dessus :
 
-![Exemple d'un arbre parcouru en utilisant un DFS]()
+![Exemple d'un arbre parcouru en utilisant un DFS](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/1%20-%20Parcours%20en%20profondeur/Image/arbre_dfs.png)
 
 Chaque nœud possède un numéro, correspondant à l'ordre de parcours de l'arbre. On commence donc à la racine, puis on visite le fils gauche (le nœud 2), on continue à descendre dans l'arbre jusqu'au nœud 3 et on arrive à une feuille de l'arbre, ce qui signifie que l'on va remonter (puisqu'on a fini de parcourir cette partie de l'arbre), on revient donc au nœud 2 et on visite son fils droit non visité (le nœud 4), de même on visite le nœud 5, c'est une feuille on remonte donc et on visite le nœud 6, on remonte de nouveau au nœud 4, et on remonte encore une fois jusqu'au nœud 2 (plus rien à visiter à partir du nœud 4), on remonte enfin jusqu'au nœud 1 (rien d'autre à visiter à partir du nœud 2), on recommence l'opération sur la partie droite, on visite le nœud 7, puis le nœud 8, le nœud 9, on remonte au nœud 8, et on visite le nœud 10, on remonte en passant par le nœud 8, puis le 7 puis le 1 pour s'apercevoir qu'on a plus rien à visiter. Le parcours en profondeur s'arrête donc ici.
 
 On peut résumer l'ordre de parcours grâce à ce schéma :
 
-![Schéma représentant l'ordre de parcours d'un DFS]()
+![Schéma représentant l'ordre de parcours d'un DFS](https://raw.githubusercontent.com/iTech-/iTechome/master/1%20-%20Algorithme/1%20-%20Structure%20de%20donnees/6%20-%20Graphe/1%20-%20Parcours%20en%20profondeur/Image/arbre_dfs_fleche.png)
 
 Maintenant qu'on a vu l'exemple sur un arbre, on peut l'appliquer sur un graphe quelconque :
 
