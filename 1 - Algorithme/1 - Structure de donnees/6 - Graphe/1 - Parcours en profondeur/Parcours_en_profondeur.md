@@ -91,13 +91,13 @@ Pour l'implémentation, j'utilise une liste d'adjacence afin de stocker les vois
 
 ### Version récursive 
 
-recursif.c : 
+recursif.cpp : [http://git.io/vt2cZ](http://git.io/vt2cZ)
 
 Comme précisé dans le code j'ai utilisé le même arbre que vu dans les exemples pour la démonstration. Quand on lance le programme on remarque qu'il affiche bien : `1 2 3 4 5 6 7 8 9 10` comme prévu. Le code est simple à comprendre et ne change en rien du pseudo-code.
 
 ### Version itérative
 
-iteratif.c :
+iteratif.cpp : [http://git.io/vt2cm](http://git.io/vt2cm)
 
 De même que pour la version récursive, le code ne change pas beaucoup du pseudo-code. Il faut noter que lorsqu'on exécute le code on obtient : `1 7 8 10 9 2 4 6 5 3`, non le résultat n'est pas faux, non le code n'est pas faux, c'est uniquement du au fait que lorsqu'on empile par exemple deux nœuds voisins, le deuxième va forcément finir au dessus du premier, alors que si on avait fait un appel récursif sur les nœuds voisins, le premier serait passé avant le deuxième. Ici notre parcours est bien un parcours en profondeur, mais dans "l'autre sens", vous pouvez vérifier, l'algorithme va juste à droite au lieu d'aller à gauche en premier, mais l'idée du parcours est la même (on peut reprendre le schéma illustrant le parcours en profondeur sur un arbre, et dessiner la flèche dans l'autre sens, c'est ce que fait la version itérative ici).
 
