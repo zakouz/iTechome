@@ -1,44 +1,45 @@
-#include <stdio.h>
+#include <stdio.h> 
 
 int tableau[] = {5, 1, 3, 8, 9, 6};
 int taille = 6;
 
 void fusion(int debut, int milieu, int fin)
 {
-	int compteurPartie1;
-	int compteurPartie2;
-	int A[milieu - debut + 1];
-	int indexTab;
+   int A[milieu - debut + 1];
+   int B[fin - milieu];
+   int indexTab, indexA, indexB;
 
-	for(indexTab = 0; indexTab <= milieu; ++indexTab)
-		A[indexTab] = tableau[indexTab + debut];
+   for(indexA = 0, indexTab = debut; indexTab <= milieu; ++indexA, ++indexTab)
+      A[indexA] = tableau[indexTab];
+   for(indexB = 0, indexTab = milieu + 1; indexTab <= fin; ++indexB, ++indexTab)
+      B[indexB] = tableau[indexTab];
 
-	compteurPartie1 = debut;
-	compteurPartie2 = milieu + 1;
+   indexA = 0;
+   indexB = 0;
 
-	for(indexTab = debut; indexTab <= fin; ++indexTab)
-	{ 
-		if(compteurPartie1 == milieu + 1) 
-		{
-			tableau[indexTab] = tableau[compteurPartie2];
-			compteurPartie2++;
-		}
-		else if(compteurPartie2 == fin + 1) 
-		{ 
-			tableau[indexTab] = A[compteurPartie1 - debut];
-			compteurPartie1++;
-		} 
-		else if(A[compteurPartie1 - debut] < tableau[compteurPartie2])
-		{ 
-			tableau[indexTab] = A[compteurPartie1 - debut];
-			compteurPartie1++; 
-		}
-		else
-		{ 
-			tableau[indexTab] = tableau[compteurPartie2];
-			compteurPartie2++; 
-		}
-	}
+   for(indexTab = debut; indexTab <= fin; ++indexTab)
+   {
+      if(indexA == milieu - debut + 1)
+      {
+         tableau[indexTab] = B[indexB];
+         ++indexB;
+      }
+      else if(indexB == fin - milieu)
+      {
+        tableau[indexTab] = A[indexA];
+         ++indexA;
+      }
+      else if(A[indexA] <= B[indexB])
+      {
+         tableau[indexTab] = A[indexA];
+         ++indexA;
+      }
+      else
+      {
+         tableau[indexTab] = B[indexB];
+         ++indexB;
+      }
+   }
 }
 
 void triFusionRecursif(int debut, int fin)
@@ -72,6 +73,7 @@ int main(void)
 	
 	for(index = 0; index < taille; ++index)
 		printf("%d ", tableau[index]);
+   printf("\n");
 		
 	return 0;
 }
